@@ -73,6 +73,30 @@ jobs:
         with:
           name: sonarcloud-html-report
           path: target/site/jacoco
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: "18"
+
+      - name: Install Newman
+        run: npm install -g newman
+
+      - name: Run Postman Tests
+        run: ./run_tests.sh
+
+      - name: Archive HTML Report
+        if: always()
+        uses: actions/upload-artifact@v2
+        with:
+          name: newman-html-report
+          path: newman-report.html
 
   cd:
     runs-on: ubuntu-latest
