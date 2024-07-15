@@ -75,7 +75,7 @@
           <properties>
             <property>
               <name>sonar.projectKey</name>
-              <value>joaquin610_BE_products_service</value>
+              <value>joaquin610_BE_orders_service</value>
             </property>
             <property>
               <name>sonar.organization</name>
