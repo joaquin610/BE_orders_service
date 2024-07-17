@@ -1,0 +1,33 @@
+{
+	"id": "386b3183-b8c0-448f-a3ab-2b36c2380b17",
+	"name": "TESTEnv",
+	"values": [
+		{
+			"key": "base_url_orders",
+			"value": "http://localhost:8080/orders",
+			"type": "default",
+			"enabled": true
+		},
+		{
+			"key": "base_url_payments",
+			"value": "http://localhost:8081/payments",
+			"type": "default",
+			"enabled": true
+		},
+		{
+			"key": "base_url_shipping",
+			"value": "http://localhost:8082/shipping",
+			"type": "default",
+			"enabled": true
+		},
+		{
+			"key": "base_url_products",
+			"value": "http://localhost:8083/products",
+			"type": "default",
+			"enabled": true
+		}
+	],
+	"_postman_variable_scope": "environment",
+	"_postman_exported_at": "2024-07-14T18:47:47.429Z",
+	"_postman_exported_using": "Postman/9.31.0"
+}

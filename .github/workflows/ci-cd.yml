@@ -28,6 +28,42 @@ jobs:
       - name: Run tests
         run: mvn test  
 
+  sonarCloudReport:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Make get_sonar_report_url.sh executable
+        run: chmod +x get_sonar_report_url.sh
+
+      - name: Get SonarCloud Report URL
+        run: ./get_sonar_report_url.sh
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: "18"
+
+      - name: Install Newman
+        run: npm install -g newman
+
+      - name: Run Postman Tests
+        run: ./run_tests.sh
+
+      - name: Archive HTML Report
+        if: always()
+        uses: actions/upload-artifact@v2
+        with:
+          name: newman-html-report
+          path: newman-report.html
 
   cd:
     runs-on: ubuntu-latest
