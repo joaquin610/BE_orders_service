@@ -65,15 +65,17 @@ jobs:
           name: newman-html-report
           path: newman-report.html
 
+
+
   cd:
     runs-on: ubuntu-latest
-    needs: build
+    needs: sonarCloudReport
     if: github.ref == 'refs/heads/main'
-      
+  
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-      
+        
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
@@ -81,22 +83,22 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
           aws-region: "us-east-1"
-
-      - name: Log in to Amazon ECR
-        run: aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin ${{ secrets.ECR_REGISTRY }}
-
+        
+      - name: Log in to Docker Hub
+        run: echo "${{ secrets.DOCKER_HUB_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_HUB_USERNAME }}" --password-stdin
+        
       - name: Build and push Docker image
         env:
-          ECR_REPOSITORY: orders-service-repo
+          DOCKER_HUB_REPOSITORY: banchero/be_orders_service
           IMAGE_TAG: ${{ github.sha }}
         run: |
-          docker build -t ${{ secrets.ECR_REGISTRY }}/$ECR_REPOSITORY:$IMAGE_TAG .
-          docker push ${{ secrets.ECR_REGISTRY }}/$ECR_REPOSITORY:$IMAGE_TAG
-
+          docker build -t $DOCKER_HUB_REPOSITORY:$IMAGE_TAG .
+          docker push $DOCKER_HUB_REPOSITORY:$IMAGE_TAG
+        
       - name: Register new task definition
         id: register-task
         env:
-          ECR_REPOSITORY: orders-service-repo
+          DOCKER_HUB_REPOSITORY: banchero/be_orders_service
           IMAGE_TAG: ${{ github.sha }}
           EXECUTION_ROLE_ARN: ${{ secrets.ECS_EXECUTION_ROLE_ARN }}
         run: |
@@ -108,7 +110,7 @@ jobs:
             "containerDefinitions": [
               {
                 "name": "app",
-                "image": "${{ secrets.ECR_REGISTRY }}/$ECR_REPOSITORY:$IMAGE_TAG",
+                "image": "$DOCKER_HUB_REPOSITORY:$IMAGE_TAG",
                 "essential": true,
                 "memory": 512,
                 "cpu": 256,
@@ -128,14 +130,13 @@ jobs:
           )
           echo "$TASK_DEF" > taskdef.json
           aws ecs register-task-definition --cli-input-json file://taskdef.json
-      
+
       - name: Update ECS service with new image
         env:
           CLUSTER_NAME: main-ecs-cluster
           SERVICE_NAME: BE_Orders_Service
           CONTAINER_NAME: app
         run: |
-          TASK_FAMILY="orders-service"
-          REVISION=$(aws ecs describe-task-definition --task-definition $TASK_FAMILY | jq .taskDefinition.revision)
-      
-      
+            TASK_FAMILY="orders-service"
+            REVISION=$(aws ecs describe-task-definition --task-definition $TASK_FAMILY | jq .taskDefinition.revision)
+            aws ecs update-service --cluster $CLUSTER_NAME --service $SERVICE_NAME --task-definition ${TASK_FAMILY}:${REVISION}
