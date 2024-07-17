@@ -30,6 +30,7 @@ jobs:
 
   sonarCloudReport:
     runs-on: ubuntu-latest
+    needs: build
 
     steps:
       - name: Checkout code
@@ -42,6 +43,7 @@ jobs:
         run: ./get_sonar_report_url.sh
   test:
     runs-on: ubuntu-latest
+    needs: sonarCloudReport
 
     steps:
       - name: Checkout code
