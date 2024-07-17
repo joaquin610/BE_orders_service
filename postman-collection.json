@@ -1,0 +1,240 @@
+{
+	"info": {
+		"_postman_id": "25023977-58fa-4c45-b0dd-7b8c5b5ccb07",
+		"name": "DEVOPS TEST",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "BE_orders_service",
+			"item": [
+				{
+					"name": "Create order",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "[\"product1\", \"product2\", \"product3\"]",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url_orders}}",
+							"host": [
+								"{{base_url_orders}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "BE_payments_service",
+			"item": [
+				{
+					"name": "Create pago",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Response body contains expected data\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('orderId', '1');",
+									"    pm.expect(jsonData).to.have.property('success').that.is.a('boolean');",
+									"    pm.expect(jsonData).to.have.property('description').that.is.a('string');",
+									"});",
+									"",
+									"pm.test(\"Description is valid\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(['Done.', 'No money.']).to.include(jsonData.description);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{base_url_payments}}/1",
+							"host": [
+								"{{base_url_payments}}"
+							],
+							"path": [
+								"1"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "BE_products_service",
+			"item": [
+				{
+					"name": "Obtener producto",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Response body contains expected data\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('id', '123');",
+									"    pm.expect(jsonData).to.have.property('name', 'Producto 123');",
+									"    pm.expect(jsonData).to.have.property('stock', 10);",
+									"    pm.expect(jsonData).to.have.property('description', 'Este es un producto');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url_products}}/123",
+							"host": [
+								"{{base_url_products}}"
+							],
+							"path": [
+								"123"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Obtener lista de productos",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Verificar que la solicitud GET devuelve un código de estado 200",
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Response is an array\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.be.an('array');",
+									"});",
+									"",
+									"pm.test(\"Response body contains expected products\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.deep.include({ \"id\": \"123\", \"name\": \"Producto 123\", \"stock\": 10, \"description\": \"Este es un producto\" });",
+									"    pm.expect(jsonData).to.deep.include({ \"id\": \"111\", \"name\": \"Producto 111\", \"stock\": 10, \"description\": \"Este es un producto\" });",
+									"    pm.expect(jsonData).to.deep.include({ \"id\": \"321\", \"name\": \"Producto 321\", \"stock\": 10, \"description\": \"Este es un producto\" });",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url_products}}",
+							"host": [
+								"{{base_url_products}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "BE_shipping_service",
+			"item": [
+				{
+					"name": "Obtener shipping",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"",
+									"pm.test(\"Response body contains expected data\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('status', 'Delivered');",
+									"    pm.expect(jsonData).to.have.property('id', 'a');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url_shipping}}/a",
+							"host": [
+								"{{base_url_shipping}}"
+							],
+							"path": [
+								"a"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create shipping",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{base_url_shipping}}/a",
+							"host": [
+								"{{base_url_shipping}}"
+							],
+							"path": [
+								"a"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
